@@ -1,0 +1,190 @@
+name: otp_2fa
+
+services:
+  backend:
+    container_name: "otp_2fa_backend"
+    depends_on:
+      mailpit:
+        condition: service_healthy
+        required: true
+      db:
+        condition: service_healthy
+        required: true
+    build:
+      context: ../backend/
+      dockerfile: Dockerfile
+#      network: host
+#      args:
+#        - HTTP_PROXY
+    restart: no
+    links:
+      # Note: only aliasing links are needed (service:alias).
+      - db:db.localhost.direct
+      - db:postgresql.localhost.direct
+      - mailpit:smtp
+      - mailpit:smtp.localhost.direct
+    env_file: &backend-env_file
+      - ../backend/django.env
+    environment: &app-environment
+      - EMAIL_URL=${EMAIL_URL:-smtp://smtp:1025}
+    volumes:
+      - type: bind
+        source: ../backend/
+        target: /app/
+        read_only: true
+#      - type: bind
+        # IMPORTANT! read: https://cloud.google.com/docs/authentication/gcloud#gcloud-credentials
+#        source: ${LOCAL_GOOGLE_APPLICATION_CREDENTIALS:-~/.config/gcloud/application_default_credentials.json}
+#        target: /root/.config/gcloud/application_default_credentials.json
+#        read_only: true
+    expose:
+      - "8000:8000"
+    ports:
+      - "8000:8000"
+
+  db:
+    container_name: "otp_2fa_db"
+    image: postgres:17
+    command:
+      # - "--autovacuum=on"
+      # - "--ssl=on"
+      # - "--ssl_ciphers=HIGH"
+      # - "--ssl_min_protocol_version=TLSv1.2"
+      - "--pgaudit.log=ddl"
+    restart: no
+    environment:
+      # - POSTGRES_INITDB_ARGS=
+      - POSTGRES_EXTENSIONS=pg_audit
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "postgres" ]
+      interval: 5s
+      start_period: 10s
+      start_interval: 1s
+      timeout: 1s
+    configs:
+      - source: init.sql
+        target: /docker-entrypoint-initdb.d/createdb.sql
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  # Lightweight, read-only Postgres GUI browser. Not meant for editing.
+  db-web-ui:
+    image: sosedoff/pgweb:0.14.3
+    command:
+      - "--listen"
+      - "80"
+      - "--url"
+      - "postgres:///?user=dev&password=dev&sslmode=disable&host=db"
+      - "--open-timeout"
+      - "5"
+      # - "--debug"
+    ports:
+      - "5051:80"
+    depends_on:
+      db:
+        condition: service_healthy
+        required: true
+
+  # Test by running: swaks --to youremail@example.com --server localhost:1025
+  mailpit:
+    image: axllent/mailpit
+    restart: unless-stopped
+    ports:
+      - ${LOCAL_SMTP_PORT:-1025}:1025
+      - 8025:8025
+    environment:
+      - MP_MAX_MESSAGES=5000
+      - MP_DATA_FILE=/data/mailpit.db
+      - MP_SMTP_AUTH_ACCEPT_ANY=1
+      - MP_SMTP_AUTH_ALLOW_INSECURE=1
+    volumes:
+      - type: bind
+        source: ../${LOCAL_DATA_DIR:-data/}mail/
+        target: /data/
+        read_only: false
+
+  # web:
+  #   restart: no
+  #   build:
+  #     context: ../frontend/
+  #     dockerfile: Dockerfile
+  #     args:
+  #       - HTTP_PROXY
+  #       # - NODE_VERSION=20-bookworm
+  #     network: host
+  #   env_file: &web-env_file
+  #     - ../frontend/.env
+  #   ports:
+  #     - "8080:8080"
+  #   volumes:
+  #     - type: bind
+  #       source: ../frontend/
+  #       target: /app/
+  #     - node_modules:/app/node_modules/
+
+#  proxy:
+#    image: caddy:2.9
+#    container_name: "otp_2fa_proxy"
+#    command:
+#      - "caddy"
+#      - "run"
+#      - "--environ"
+#      - "--config"
+#      - "/etc/caddy/Caddyfile"
+#      - "--adapter"
+#      - "caddyfile"
+#    environment:
+#      - COMPOSE_PROJECT_NAME
+#      - LOCAL_FRONTEND_ADDRESS=${LOCAL_FRONTEND_ADDRESS:-web:8080}
+#    links:
+#      - mailpit:mail
+#    ports:
+#      - 80:80
+#      - 443:443
+#      - "${LOCAL_HTTP_PORT:-80}:80"
+#      - "${LOCAL_HTTPS_PORT:-443}:443/tcp"
+#      - "${LOCAL_HTTPS_PORT:-443}:443/udp"
+#    volumes:
+#      - type: bind
+#        source: ./Caddyfile
+#        target: /etc/caddy/Caddyfile
+#        read_only: true
+#      - type: bind
+#        source: ../backend/
+#        target: /app/
+#        read_only: true
+#      - type: bind
+#        source: ./localhost.direct;*.localhost.direct.cert
+#        target: /etc/ssl/certs/localhost.direct.crt
+#        read_only: true
+#      - type: bind
+#        source: ./localhost.direct;*.localhost.direct.key
+#        target: /etc/ssl/private/localhost.direct.key
+#        read_only: true
+#      - type: bind
+#        source: ./localhost.direct.crt
+#        target: /etc/ssl/certs/localhost.direct.crt
+#        read_only: true
+#      - type: bind
+#        source: ./localhost.direct.key
+#        target: /etc/ssl/private/localhost.direct.key
+#        read_only: true
+
+configs:
+  init.sql:
+    content: |
+      -- TODO: Enable pg_audit extension as done in prod.
+      -- CREATE EXTENSION IF NOT EXISTS pg_audit;
+      CREATE USER dev WITH PASSWORD 'dev';
+      CREATE DATABASE dev OWNER dev LOCALE 'en_US.utf8' ENCODING 'UTF8';
+      GRANT ALL PRIVILEGES ON DATABASE dev TO dev;
+      ALTER USER dev CREATEDB;
+
+volumes:
+  pgdata:
+  node_modules:
