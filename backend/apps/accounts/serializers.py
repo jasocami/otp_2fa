@@ -59,12 +59,6 @@ class ObtainUserTokenSerializer(TokenObtainPairSerializer):
 
         data = {}
 
-        # if self.user.password_expiration_date is None \
-        #         or self.user.password_expiration_date < date.today():
-        #     token = default_token_generator.make_token(self.user)
-        #     Communication().send_update_expired_password_email(self.user, token)
-        #     raise PasswordExpiredException()
-
         refresh = self.get_token(self.user)
 
         if constance_config.IS_TWO_FACTOR_AUTH_ACTIVE:

@@ -69,24 +69,6 @@ class Communication:
         body = loader.render_to_string(body_template_name, context)
         return self.send_email(subject, body, to=[user.email])
 
-    # def send_activate_account_email(self, user, frontend_url, token):
-    #     """
-    #     Send an email to activate the email.
-    #     Context needs 'user', 'frontend_url' and 'token'
-    #     """
-    #
-    #     subject_template_name = 'email_activate_account_subject.txt'
-    #     body_template_name = 'email_activate_account_body.html'
-    #
-    #     subject = loader.render_to_string(subject_template_name)
-    #     subject = ''.join(subject.splitlines())
-    #     context = {
-    #         'user': user,
-    #         'frontend_url': f'{ frontend_url }/activate-account/{ token }/',
-    #     }
-    #     body = loader.render_to_string(body_template_name, context)
-    #     return self.send_email(subject, body, to=[user.email])
-
     def send_otp_email(self, user, otp_code):
         """ Send an email to create a new bucket. """
 

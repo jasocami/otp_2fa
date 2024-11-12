@@ -35,7 +35,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         default=False,
         help_text=_('Designates whether the user can log into this admin site.'),
     )
-    # password_expiration_date = models.DateField(null=True, blank=True)
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
 
     objects = CustomUserManager()
@@ -59,30 +58,6 @@ class User(AbstractBaseUser, PermissionsMixin):
             return otp.is_verified
         except OTP.DoesNotExist:
             return False
-
-    # def set_new_password_expire_date(self):
-    #     days = constance_config.DAYS_TO_PASSWORD_EXPIRE
-    #     self.password_expiration_date = date.today() + timedelta(days=days)
-
-    # def save(self, *args, **kwargs):
-    #     if not self.id and not self.password_expiration_date:
-    #         self.set_new_password_expire_date()
-    #     fields_stats = []
-    #     if self.id:
-    #         orig = User.objects.get(pk=self.pk)
-    #         field_names = [field.name for field in User._meta.fields]
-    #         for field_name in field_names:
-    #             old_value = getattr(orig, field_name)
-    #             new_value = getattr(self, field_name)
-    #             if old_value != new_value:
-    #                 reg = f'{field_name}'
-    #                 if field_name != 'email':  # Keep the anonymize mode for the user
-    #                     reg = f'{reg} {old_value} to {new_value}'
-    #                 fields_stats.append(reg)
-    #     else:
-    #         fields_stats = [f'{self.role}']
-    #     self.fields_stats = ','.join(fields_stats)
-    #     super().save(*args, **kwargs)
 
     def anonymize(self):
         import uuid
@@ -129,12 +104,11 @@ class OTP(models.Model):
         self.save()
 
     def validate_otp_code(self, otp_input) -> bool:
-        """ Validate an OTP input code from user """
+        """ Validate an OTP input code from user, with 8 window of 30 sec each, equal to 4 min """
         if self.otp_code != otp_input:
             return False
 
         totp = pyotp.TOTP(self._generate_secret())
-        # Validate OTP with 8 window of 30 sec each, equal to 4 min
         if totp.verify(otp_input, valid_window=8):
             self.is_verified = True
             self.save()

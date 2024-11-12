@@ -74,7 +74,7 @@ class OTPThrottle(UserRateThrottle):
 class ReSendOTPAPIView(APIView):
     """ Re-send OTP code to the user email requester. Only one request every minute is allowed """
     permission_classes = [IsAuthenticated]
-    throttle_classes = [OTPThrottle]  # User can ony request every 1 minute
+    throttle_classes = [OTPThrottle]
 
     def post(self, request):
         user = request.user

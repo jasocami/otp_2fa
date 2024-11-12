@@ -8,8 +8,6 @@ def my_import(name):
 
 def override_docstring(**kwargs):
     def wrapper(func):
-        # Perform authentication logic
-
         if 'errors' in kwargs:
             txt = ""
             result = {}
