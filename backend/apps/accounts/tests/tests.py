@@ -32,7 +32,7 @@ class UserBasicTests(BaseTestCase, TestUserConstants):
         rs = self.client.get(reverse('accounts:user-blocked'), format='json')
         self.assertEqual(rs.status_code, 403)
 
-    def test_otp_process(self):
+    def test_otp_process_ok(self):
         self.login_user(self.user_email, self.user_password, self.client)
 
         self.assertEqual(len(mail.outbox), 1)
@@ -46,3 +46,18 @@ class UserBasicTests(BaseTestCase, TestUserConstants):
         rs = self.client.get(reverse('accounts:user-blocked'), format='json')
         self.assertEqual(rs.status_code, 200)
         self.assertTrue(rs.data.get('success'))
+
+    def test_otp_process_ko(self):
+        self.login_user(self.user_email, self.user_password, self.client)
+
+        self.assertEqual(len(mail.outbox), 1)
+        results = re.findall(r'(?:otp_code: )([0-9]{,6})', mail.outbox[0].body)
+        assert len(results) == 1
+
+        data = {'otp_code': 1234}
+        rs = self.client.post(reverse('accounts:verify_otp'), data, format='json')
+        self.assertEqual(rs.status_code, 400)
+        self.assertEqual(rs.data.get('code'), 'otp_code_invalid_expired')
+
+        rs = self.client.get(reverse('accounts:user-blocked'), format='json')
+        self.assertEqual(rs.status_code, 403)

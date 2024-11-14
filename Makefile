@@ -84,6 +84,10 @@ clean-remove-volumes:
 	@echo "compose rmi all and volumes. Use CTRL+C to stop."
 	$(run-compose) down -v --rmi all
 
+
+backend-test:
+	$(run-compose) exec -it backend bash -c "python manage.py test"
+
 renew-certs:
 	curl --silent --show-error --location \
 		--output /tmp/localhost.direct.zip https://aka.re/localhost
@@ -105,7 +109,7 @@ renew-certs-new:
 	  --output ./devops/backloop.dev-key.pem https://backloop.dev/backloop.dev-key.pem
 	ls ./devops/
 
-start: renew-certs-new build-no-cache up
+start: renew-certs-new clone-env create-mailpit-folder build-no-cache up
 
 clone-env:
 	@echo "Clone env files"
