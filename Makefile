@@ -56,6 +56,10 @@ up/proxy:
 	@echo "compose up all. Use CTRL+C to stop."
 	$(run-compose) up proxy
 
+up/web:
+	@echo "compose up all. Use CTRL+C to stop."
+	$(run-compose) up web
+
 build:
 	@echo "compose build all. Use CTRL+C to stop."
 	$(run-compose) build

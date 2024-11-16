@@ -8,7 +8,7 @@ ARG NPM_URL=https://registry.npmjs.org
 RUN npm set registry ${NPM_URL} && npm get registry
 
 RUN --mount=type=cache,mode=0755,target=/root/.npm/ \
-  npm install --loglevel ${NPM_LOGLEVEL} -g @vue/cli
+  npm install --loglevel ${NPM_LOGLEVEL} -g vite
 ENV APP_HOME=/app
 WORKDIR ${APP_HOME}
 
@@ -19,4 +19,4 @@ RUN --mount=type=cache,mode=0755,target=/root/.npm/ \
 COPY . .
 
 ENTRYPOINT [ "npm" ]
-CMD [ "run", "serve" ]
+CMD [ "run", "dev" ]

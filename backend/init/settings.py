@@ -65,12 +65,14 @@ INSTALLED_APPS = [
     'constance.backends.database',
     'django_extensions',
     'drf_spectacular',
+    'corsheaders',
     # Apps
     'apps.accounts.apps.AccountsConfig',
     'apps.generic.apps.GenericConfig',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -290,3 +292,5 @@ SPECTACULAR_SETTINGS = {
         'defaultModelExpandDepth': -1
     },
 }
+
+CORS_ALLOW_ALL_ORIGINS = True
