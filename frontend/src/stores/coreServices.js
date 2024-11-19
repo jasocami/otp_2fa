@@ -26,7 +26,6 @@ export function coreServices() {
     async delete(url) {
       return axios.delete(this.createUrl(url), { headers: this.getRequestHeader() });
     },
-
     getRequestHeader() {
       const accessToken = getCookie('accessToken');
       return {

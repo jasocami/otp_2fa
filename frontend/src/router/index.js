@@ -1,27 +1,38 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useGenericStore } from '@/stores';
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
     {
-      path: '/',
+      path: '/login',
       name: 'login',
       component: import('@/views/Login.vue'),
     },
     {
-      path: '/home',
+      path: '/verify-otp',
+      name: 'verifyOtp',
+      component: import('@/views/VerifyOtp.vue'),
+    },
+    {
+      path: '/',
       name: 'home',
       component: import('@/views/Home.vue'),
     },
-    // {
-    //   path: '/about',
-    //   name: 'about',
-    //   // route level code-splitting
-    //   // this generates a separate chunk (About.[hash].js) for this route
-    //   // which is lazy-loaded when the route is visited.
-    //   component: () => import('../views/AboutView.vue'),
-    // },
   ],
 })
+
+router.beforeEach(async (to) => {
+  // redirect to login page if not logged in and trying to access a restricted page
+  const publicPages = ['/login'];
+  const authRequired = !publicPages.includes(to.path);
+  const auth = useGenericStore();
+  console.log(authRequired, !auth.user);
+  if (authRequired && !auth.user) {
+    console.log('in');
+    // auth.returnUrl = to.fullPath;
+    return '/login';
+  }
+});
 
 export default router

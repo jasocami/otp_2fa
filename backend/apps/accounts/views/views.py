@@ -25,10 +25,10 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     pagination_class = None
 
-    def get_permissions(self):
-        if self.action != 'me':
-            return [IsOTPVerified()]
-        return super().get_permissions()
+    # def get_permissions(self):
+    #     if self.action != 'me':
+    #         return [IsOTPVerified()]
+    #     return super().get_permissions()
 
     @action(detail=False, methods=['GET'], url_path='me')
     def me(self, request, *args, **kwargs):

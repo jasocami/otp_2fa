@@ -27,116 +27,61 @@
   </v-container>
 </template>
 
-<script>
-import { ref, computed } from 'vue';
-import { userServicesStore } from '@/stores/userServices';
-import { getAccessTokenExpiration, getRefreshTokenExpiration, getCookie, setCookie, removeCookies } from '@/utils/cookieManager';
+<script setup>
+  import { ref, computed } from 'vue';
+  import router from '@/router';
+  import { useAuthStore, useGenericStore } from '@/stores';
+  import { getAccessTokenExpiration, getRefreshTokenExpiration, getCookie, setCookie, removeCookies } from '@/utils/cookieManager';
 
-export default {
-  setup() {
-    const email = ref('');
-    const visible = ref(false);
-    const password = ref('');
-    const emailRules = [
-      v => !!v || 'E-mail is required',
-      v => /.+@.+\..+/.test(v) || 'E-mail must be valid',
-    ];
-    const passwordRules = [
-      v => !!v || 'Password is required',
-      v => (v && v.length >= 6) || 'Password must be more than 6 characters',
-    ];
-    const toggleVisibility = () => {
-      visible.value = !visible.value;
+  const email = ref('');
+  const visible = ref(false);
+  const password = ref('');
+  const emailRules = [
+    v => !!v || 'E-mail is required',
+    v => /.+@.+\..+/.test(v) || 'E-mail must be valid',
+  ];
+  const passwordRules = [
+    v => !!v || 'Password is required',
+    v => (v && v.length >= 6) || 'Password must be more than 6 characters',
+  ];
+  const toggleVisibility = () => {
+    visible.value = !visible.value;
+  };
+  const formValid = computed(() => {
+    const emailValid = /.+@.+\..+/.test(email.value);
+    const passwordValid = password.value && password.value.length >= 6;
+    return !(emailValid && passwordValid);
+  });
+
+  const authStore = useAuthStore();
+  const genericStore = useGenericStore();
+
+  const login = () => {
+    removeCookies();
+    const data = {
+      email: email.value,
+      password: password.value,
     };
-    const formValid = computed(() => {
-      const emailValid = /.+@.+\..+/.test(email.value);
-      const passwordValid = password.value && password.value.length >= 6;
-      return !(emailValid && passwordValid);
-    });
-
-    const userStore = userServicesStore()
-
-    return {
-      emailRules,
-      passwordRules,
-      email,
-      visible,
-      password,
-      toggleVisibility,
-      formValid,
-      userStore,
-    };
-  },
-  methods: {
-    async login() {
-      // store.dispatch('setLoading', true);
-      removeCookies();
-      try {
-        const response = await this.userStore.login({
-          email: email.value,
-          password: password.value,
-        });
-        // store.commit('setLoading', false);
-        try {
-          setCookie('accessToken', response.data.tokens.access, getAccessTokenExpiration());
-          setCookie('refreshToken', response.data.tokens.refresh, getRefreshTokenExpiration());
-          if (!getCookie('accessToken') || getCookie('accessToken') === undefined) {
-            console.log('Im in!');
-            // store.commit('setLoading', false);
-            // toast(
-            //   "This site requires permissions to store data on your device. Please allow storage in your browser settings.",
-            //   {
-            //     type: "warning",
-            //     transition: "slide",
-            //     dangerouslyHTMLString: true
-            //   }
-            // );
-          }
-          // store.commit('setUser', response.data.user);
-          // store.commit('setTokens', response.data.tokens);
-
-          setTimeout(() => {
-            // store.commit('setLoading', false);
-            // router.push('/home');
-          }, 1500);
-        } catch (e) {
-          console.error("Error setting cookies or handling login:", e);
-        }
-      } catch (error) {
-        console.log(JSON.stringify(error));
-        // store.commit('setLoading', false);
-        if (error.response && error.response.status === 400) {
-          const errorCode = error.response.data.code;
-          if (errorCode === 'password_expired') {
-            console.error('Your password has expired. Check your email in order to update it.');
-            // toast("Your password has expired. Check your email in order to update it.", {
-            //   type: "error",
-            //   autoClose: 7000,
-            //   transition: "slide",
-            //   dangerouslyHTMLString: true
-            // });
-          } else {
-            console.error('Invalid login credentials. Please try again.');
-            // toast("Invalid login credentials. Please try again.", {
-            //   type: "error",
-            //   transition: "slide",
-            //   dangerouslyHTMLString: true
-            // });
-          }
+    authStore.login(data).then((response) => {
+      console.log(response.data);
+      genericStore.setUser(response.data.user);
+      genericStore.setTokens(response.data.tokens);
+      router.push('/verify-otp');
+    })
+    .catch((error) => {
+      console.log(error);
+      if (error.response && error.response.status === 400) {
+        const errorCode = error.response.data.code;
+        if (errorCode === 'password_expired') {
+          console.error('Your password has expired. Check your email in order to update it.');
         } else {
-          console.error('An error occurred. Please try again.');
-          // toast("An error occurred. Please try again.", {
-          //   type: "error",
-          //   transition: "slide",
-          //   dangerouslyHTMLString: true
-          // });
+          console.error('Invalid login credentials. Please try again.');
         }
-
-        console.log("Error durante el login:", error);
+      } else {
+        console.error('An error occurred. Please try again.');
       }
-    }
-  },
-}
+    });
+  }
 </script>
 
 <style>
