@@ -6,10 +6,10 @@ export const useUsersStore = defineStore({
     id: 'users',
     state: () => ({}),
     actions: {
-        async getMe() {
+        getMe() {
             return coreServices().get('/users/me/');
         },
-        async getBlocked() {
+        getBlocked() {
             return coreServices().get('/users/blocked/');
         },
     }

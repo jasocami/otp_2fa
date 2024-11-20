@@ -1,10 +1,12 @@
 import { defineStore } from 'pinia';
+import { getAccessTokenExpiration, getRefreshTokenExpiration, getCookie, setCookie, removeCookies } from '@/utils/cookieManager';
 
 export const useGenericStore = defineStore({
   id: 'generic',
   state: () => ({
-    user: JSON.parse(localStorage.getItem('user')),
-    tokens: JSON.parse(localStorage.getItem('tokens')),
+    user: null, // getCookie('user'),
+    accessToken: getCookie('accessToken'),
+    refreshToken: getCookie('refreshToken'),
     isLoading: false,
     isAppLoaded: false,
     activeRoute: '/',
@@ -12,19 +14,20 @@ export const useGenericStore = defineStore({
   actions: {
     resetState() {
       this.user = null;
-      this.tokens = null;
+      this.accessToken = null;
+      this.refreshToken = null;
       this.isAppLoaded = false;
-      localStorage.removeItem('user');
-      localStorage.removeItem('tokens');
-      // TODO: remove users and tokens local storage
+      removeCookies();
     },
     setUser(user) {
-      localStorage.setItem('user', JSON.stringify(user));
+      // setCookie('user', JSON.stringify(user), );
       this.user = user;
     },
     setTokens(tokens) {
-      localStorage.setItem('tokens', JSON.stringify(tokens));
-      this.tokens = tokens;
+      setCookie('accessToken', tokens['access'], getAccessTokenExpiration());
+      this.accessToken = tokens['access'];
+      setCookie('refreshToken', tokens['refresh'], getRefreshTokenExpiration());
+      this.refreshToken = tokens['refresh'];
     },
     setLoading(isLoading) {
       this.isLoading = isLoading;

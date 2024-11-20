@@ -23,13 +23,13 @@ class UserSerializer(serializers.ModelSerializer):
     """ Extended info for a user model """
 
     date_joined = custom_datetime_field()
-    otp_verified = serializers.SerializerMethodField()
+    has_otp_verified = serializers.SerializerMethodField()
 
     class Meta:
         model = UserModel
         exclude = ('password', 'groups', 'user_permissions', 'last_login')
 
-    def get_otp_verified(self, obj):
+    def get_has_otp_verified(self, obj):
         return obj.has_otp_verified
 
 

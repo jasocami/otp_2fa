@@ -9,17 +9,16 @@
   </v-app>
 </template>
 
-<script>
-import { RouterView } from 'vue-router'
-import { getCookie } from '@/utils/cookieManager';
+<!--<script>-->
+<!--import { getCookie } from '@/utils/cookieManager';-->
 
-export default {
-  setup() {
-    const accessToken = () => {
-      const access = getCookie('accessToken');
-    }
-    return {
-    }
-  }
-}
-</script>
+<!--export default {-->
+<!--  setup() {-->
+<!--    const accessToken = () => {-->
+<!--      const access = getCookie('accessToken');-->
+<!--    }-->
+<!--    return {-->
+<!--    }-->
+<!--  }-->
+<!--}-->
+<!--</script>-->

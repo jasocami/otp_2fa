@@ -15,6 +15,7 @@ export function coreServices() {
       return axios.post(this.createUrl(url), data, { headers: this.getRequestHeader(), responseType: 'blob' });
     },
     async post(url, data, headers) {
+      if (!headers) headers = this.getRequestHeader();
       return axios.post(this.createUrl(url), data, { headers: headers });
     },
     async put(url, data) {

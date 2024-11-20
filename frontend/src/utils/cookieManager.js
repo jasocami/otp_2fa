@@ -1,13 +1,11 @@
 export function getAccessTokenExpiration() {
     const now = new Date();
-    const expiration = new Date(now.getTime() + 60 * 60000 * 1); // 1h
-    return expiration;
+    return new Date(now.getTime() + 60 * 60000 * 1); // 1h
   }
   
   export function getRefreshTokenExpiration() {
     const now = new Date();
-    const expiration = new Date(now.getTime() + 7 * 24 * 60 * 60000); // 7 dias
-    return expiration;
+    return new Date(now.getTime() + 7 * 24 * 60 * 60000); // 7 dias
   }
   
   export function setCookie(name, value, expiration) {

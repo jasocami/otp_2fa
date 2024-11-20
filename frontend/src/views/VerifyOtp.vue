@@ -31,6 +31,7 @@
 
 <script setup>
   import { ref, computed } from 'vue';
+  import router from '@/router';
   import { useAuthStore, useGenericStore } from '@/stores';
   import { getAccessTokenExpiration, getRefreshTokenExpiration, getCookie, setCookie, removeCookies } from '@/utils/cookieManager';
 
@@ -47,7 +48,7 @@
     const data = { otp_code: otp.value };
     authStore.verifyOtp(data).then((response) => {
       console.log(response.data);
-      router.push('/');
+      router.push({ name: 'home' });
     })
     .catch((error) => {
       console.log(error);

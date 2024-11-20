@@ -13,7 +13,7 @@ export const useAuthStore = defineStore({
       return coreServices().post('/users/logout/', data, '');
     },
     async verifyOtp(data) {
-      return coreServices().post('/users/verify-otp/', data, '');
+      return coreServices().post('/users/verify-otp/', data);
     },
     async resendOtp() {
       return coreServices().post('/users/resend-otp/', {}, '');
