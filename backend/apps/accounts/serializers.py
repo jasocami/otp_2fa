@@ -94,4 +94,4 @@ class OTPSerializer(serializers.Serializer):
         otp_code = self.validated_data['otp_code']
         if otp_instance.validate_otp_code(otp_code) and not otp_instance.is_expired():
             return True
-        raise False
+        raise OTPCodeInvalidExpiredException()

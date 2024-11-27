@@ -294,3 +294,11 @@ SPECTACULAR_SETTINGS = {
 }
 
 CORS_ALLOW_ALL_ORIGINS = True
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:8080',
+    'https://localhost:8080',
+    'https://0.0.0.0:8080',
+    'http://0.0.0.0:8080',
+    'http://127.0.0.1:8080',
+]
