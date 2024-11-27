@@ -1,16 +1,21 @@
 import { defineStore } from 'pinia';
-import { coreServices } from '@/stores/coreServices'
+import { coreServices } from '@/utils/coreServices'
 
 
 export const useUsersStore = defineStore({
     id: 'users',
-    state: () => ({}),
+    state: () => ({
+        user:  null,
+        blocked: null,
+    }),
     actions: {
-        getMe() {
-            return coreServices().get('/users/me/');
+        async getMe() {
+            const response = await coreServices().get('/users/me/');
+            this.user = response.data;
         },
-        getBlocked() {
-            return coreServices().get('/users/blocked/');
+        async getBlocked() {
+            const response = await coreServices().get('/users/blocked/');
+            this.blocked = response.data;
         },
     }
 });

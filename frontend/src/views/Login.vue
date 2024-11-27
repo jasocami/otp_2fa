@@ -21,7 +21,11 @@
             Sign In
           </v-btn>
         </v-form>
-
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col class="text-center">
+        {{ authStore.apiError }}
       </v-col>
     </v-row>
   </v-container>
@@ -29,9 +33,9 @@
 
 <script setup>
   import { ref, computed } from 'vue';
-  import router from '@/router';
   import { useAuthStore, useGenericStore } from '@/stores';
   import { getAccessTokenExpiration, getRefreshTokenExpiration, getCookie, setCookie, removeCookies } from '@/utils/cookieManager';
+  import router from '@/router';
 
   const email = ref('');
   const visible = ref(false);
@@ -54,33 +58,20 @@
   });
 
   const authStore = useAuthStore();
-  const genericStore = useGenericStore();
 
-  const login = () => {
+  const login = async () => {
     removeCookies();
     const data = {
       email: email.value,
       password: password.value,
     };
-    authStore.login(data).then((response) => {
-      console.log(response.data);
-      genericStore.setUser(response.data.user);
-      genericStore.setTokens(response.data.tokens);
-      router.push('/verify-otp');
-    })
-    .catch((error) => {
-      console.log(error);
-      if (error.response && error.response.status === 400) {
-        const errorCode = error.response.data.code;
-        if (errorCode === 'password_expired') {
-          console.error('Your password has expired. Check your email in order to update it.');
-        } else {
-          console.error('Invalid login credentials. Please try again.');
-        }
-      } else {
-        console.error('An error occurred. Please try again.');
-      }
-    });
+    authStore.login(data);
+    console.log('Done');
+      // router.push({ name: 'verify_otp' });
+/*
+import { useRouter } from "vue-router";
+const router = useRouter();
+  */
   }
 </script>
 

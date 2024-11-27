@@ -7,7 +7,7 @@ import App from './App.vue'
 import router from './router'
 
 // My cfg
-import "./axiosConfig";
+// import "./axiosConfig";
 
 // Vuetify
 import 'vuetify/styles'

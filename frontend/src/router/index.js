@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useAuthStore, useUsersStore, useGenericStore } from '@/stores';
+import { useAuthStore, useUsersStore } from '@/stores';
 import { getCookie } from "@/utils/cookieManager.js";
 
 const router = createRouter({
@@ -12,7 +12,7 @@ const router = createRouter({
     },
     {
       path: '/verify-otp',
-      name: 'verifyOtp',
+      name: 'verify_otp',
       component: import('@/views/VerifyOtp.vue'),
       beforeEnter: checkPermission,
     },
@@ -29,20 +29,23 @@ async function checkPermission(to, from, next) {
   // redirect to login page if not logged in and trying to access a restricted page
 
   // Check that there is a token
-  const genericStore = useGenericStore();
-  const a_token = genericStore.accessToken // getCookie('accessToken');
+  const authStore = useAuthStore();
+  console.log('R1');
+  const a_token = authStore.accessToken; // getCookie('accessToken');
+  console.log('R2', a_token);
   if (!a_token) {
     return next({ name: 'login' });
   }
   // Check that the user has approved otp code
   const userStore = useUsersStore();
-  const me = await userStore.getMe();
+  await userStore.getMe();
   // .then((response) => {
   //   console.log(response.data);
-  if (to.name !== 'verifyOtp' && !me.data.has_otp_verified) {
-    next({ name: 'verifyOtp' });
+  console.log('done1');
+  if (to.name !== 'verify_otp' && !userStore.user?.has_otp_verified) {
+    next({ name: 'verify_otp' });
   }
-  else if (to.name === 'verifyOtp' && me.data.has_otp_verified) {
+  else if (to.name === 'verify_otp' && userStore.user?.has_otp_verified) {
     next({ name: 'home' });
   }
   // }).catch((error) => {

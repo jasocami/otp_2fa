@@ -18,6 +18,9 @@ export default defineConfig({
     host: true,
     port: 8080,
   },
+  devServer: {
+    proxy: 'http://localhost:8000'
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))

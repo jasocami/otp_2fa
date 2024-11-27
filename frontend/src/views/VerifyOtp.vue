@@ -26,14 +26,17 @@
         </v-btn>
       </v-col>
     </v-row>
+    <v-row>
+      <v-col>
+        ApiError: {{ authStore.apiError }}
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
 <script setup>
   import { ref, computed } from 'vue';
-  import router from '@/router';
-  import { useAuthStore, useGenericStore } from '@/stores';
-  import { getAccessTokenExpiration, getRefreshTokenExpiration, getCookie, setCookie, removeCookies } from '@/utils/cookieManager';
+  import { useAuthStore } from '@/stores';
 
   const otp = ref('');
   const otpRules = [
@@ -42,26 +45,14 @@
   ];
 
   const authStore = useAuthStore();
-  const genericStore = useGenericStore();
 
-  const verify = () => {
+  const verify = async () => {
     const data = { otp_code: otp.value };
-    authStore.verifyOtp(data).then((response) => {
-      console.log(response.data);
-      router.push({ name: 'home' });
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+    await authStore.verifyOtp(data)
   }
 
-  const resend = () => {
-    authStore.resendOtp().then((response) => {
-      console.log(response.data);
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+  const resend = async () => {
+    await authStore.resendOtp();
   }
 </script>
 
