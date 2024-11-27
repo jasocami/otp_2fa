@@ -95,7 +95,9 @@ backend-test:
 renew-certs:
 	curl --silent --show-error --location \
 		--output /tmp/localhost.direct.zip https://aka.re/localhost
-	unzip -o -u -P IWillNotPutKeyFileInPublicAccessiblePlace /tmp/localhost.direct.zip -d ./devops/
+	unzip -o -u -P IWillNotPutKeyFileInPublicAccessiblePlace.X1YKK /tmp/localhost.direct.zip -d ./devops/
+
+# https://github.com/Upinel/localhost.direct
 
 renew-certs-new:
 	rm -f \
@@ -103,7 +105,7 @@ renew-certs-new:
 		./devops/backloop.dev*
 	curl --silent --show-error --location \
 		--output /tmp/localhost.direct.zip https://aka.re/localhost
-	unzip -o -u -P IWillNotPutKeyFileInPublicAccessiblePlace \
+	unzip -o -u -P IWillNotPutKeyFileInPublicAccessiblePlace.X1YKK \
 		/tmp/localhost.direct.zip -d ./devops/
 	curl --silent --show-error --location \
 	  --output ./devops/backloop.dev-ca.crt https://backloop.dev/backloop.dev-ca.crt
