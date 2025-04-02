@@ -1,4 +1,3 @@
-## -*- dockerfile-image-name: "datalake-frontend" -*-
 ARG NODE_VERSION=20-bookworm
 FROM node:${NODE_VERSION}
 
