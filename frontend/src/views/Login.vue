@@ -46,14 +46,14 @@
   ];
   const passwordRules = [
     v => !!v || 'Password is required',
-    v => (v && v.length >= 6) || 'Password must be more than 6 characters',
+    v => (v && v.length >= 1) || 'Password must be more than 6 characters',
   ];
   const toggleVisibility = () => {
     visible.value = !visible.value;
   };
   const formValid = computed(() => {
     const emailValid = /.+@.+\..+/.test(email.value);
-    const passwordValid = password.value && password.value.length >= 6;
+    const passwordValid = password.value && password.value.length >= 1;
     return !(emailValid && passwordValid);
   });
 

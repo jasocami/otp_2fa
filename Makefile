@@ -33,13 +33,6 @@ help:
 
 # Commands
 
-# venv:
-# 	@echo "Activate venv"
-# 	( \
-#        source ../venv/bin/activate; \
-#        pip freeze; \
-#     )
-
 up:
 	@echo "compose up all. Use CTRL+C to stop."
 	$(run-compose) up
@@ -88,7 +81,6 @@ clean-remove-volumes:
 	@echo "compose rmi all and volumes. Use CTRL+C to stop."
 	$(run-compose) down -v --rmi all
 
-
 backend-test:
 	$(run-compose) exec -it backend bash -c "python manage.py test"
 
@@ -119,7 +111,7 @@ start: renew-certs-new clone-env create-mailpit-folder build-no-cache up
 
 clone-env:
 	@echo "Clone env files"
-	cp backend/django.env.example backend/django.env
+	cp backend/env.example backend/.env
 
 create-mailpit-folder:
 	@echo "Create mailpit directories"

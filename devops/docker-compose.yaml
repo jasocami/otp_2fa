@@ -24,7 +24,7 @@ services:
       - mailpit:smtp
       - mailpit:smtp.localhost.direct
     env_file: &backend-env_file
-      - ../backend/django.env
+      - ../backend/.env
     environment: &app-environment
       - EMAIL_URL=${EMAIL_URL:-smtp://smtp:1025}
     volumes:
@@ -52,12 +52,12 @@ services:
       # - "--ssl_min_protocol_version=TLSv1.2"
       - "--pgaudit.log=ddl"
     restart: no
-    environment:
+#    environment:
       # - POSTGRES_INITDB_ARGS=
-      - POSTGRES_EXTENSIONS=pg_audit
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=postgres
+#      - POSTGRES_EXTENSIONS=pg_audit
+#      - POSTGRES_USER=postgres
+#      - POSTGRES_PASSWORD=postgres
+#      - POSTGRES_DB=postgres
     ports:
       - "5432:5432"
     healthcheck:
